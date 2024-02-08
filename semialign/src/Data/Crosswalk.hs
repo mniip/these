@@ -17,6 +17,7 @@ import Data.Functor.Compose      (Compose (..))
 import Data.Functor.Const        (Const (..))
 import Data.Functor.Identity     (Identity (..))
 import Data.Functor.Sum          (Sum (..))
+import Data.Functor.These        (These1 (..))
 import Data.Proxy                (Proxy (..))
 import Data.Traversable          (Traversable (traverse))
 import Data.Vector.Generic       (Vector)
@@ -106,6 +107,12 @@ instance Crosswalk (Const r) where
 instance (Crosswalk f, Crosswalk g) => Crosswalk (Sum f g) where
     crosswalk f (InL xs) = InL <$> crosswalk f xs
     crosswalk f (InR xs) = InR <$> crosswalk f xs
+
+instance (Crosswalk f, Crosswalk g) => Crosswalk (These1 f g) where
+    crosswalk f (This1 xs) = This1 <$> crosswalk f xs
+    crosswalk f (That1 ys) = That1 <$> crosswalk f ys
+    crosswalk f (These1 xs ys) = alignWith go (crosswalk f xs) (crosswalk f ys)
+      where go = these This1 That1 These1
 
 instance (Crosswalk f, Crosswalk g) => Crosswalk (Compose f g) where
     crosswalk f
