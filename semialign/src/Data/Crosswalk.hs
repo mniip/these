@@ -8,13 +8,12 @@ module Data.Crosswalk (
     Bicrosswalk (..),
     ) where
 
-import Control.Applicative       (Applicative (pure, (<*>)), (<$>))
+import Control.Applicative       (Applicative (pure, (<*>)), (<$>), Const(..))
 import Control.Monad.Trans.Maybe (MaybeT (..))
 import Data.Bifoldable           (Bifoldable (..))
 import Data.Bifunctor            (Bifunctor (..))
 import Data.Foldable             (Foldable (..))
 import Data.Functor.Compose      (Compose (..))
-import Data.Functor.Const        (Const (..))
 import Data.Functor.Identity     (Identity (..))
 import Data.Functor.Sum          (Sum (..))
 import Data.Functor.These        (These1 (..))

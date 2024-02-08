@@ -6,10 +6,10 @@ module Tests.Crosswalk (crosswalkProps) where
 import Prelude ()
 import Prelude.Compat
 
+import Control.Applicative           (Const)
 import Control.Monad.Trans.Instances ()
 import Control.Monad.Trans.Maybe     (MaybeT)
 import Data.Functor.Compose          (Compose (..))
-import Data.Functor.Const            (Const)
 import Data.Functor.Identity         (Identity (..))
 import Data.Functor.Sum              (Sum)
 import Data.Functor.These            (These1)
