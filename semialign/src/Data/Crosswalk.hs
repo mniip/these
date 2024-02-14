@@ -22,7 +22,10 @@ import Data.Traversable          (Traversable (traverse))
 import Data.Vector.Generic       (Vector)
 import Prelude                   (Either (..), Functor (fmap), Maybe (..), id, (.), uncurry, maybe)
 
+import qualified Data.HashMap.Lazy   as HM
+import qualified Data.IntMap         as IM
 import qualified Data.List.NonEmpty  as NE
+import qualified Data.Map            as M
 import qualified Data.Sequence       as Seq
 import qualified Data.Vector         as V
 import qualified Data.Vector.Generic as VG
@@ -130,6 +133,18 @@ instance Align f => Applicative (Fill f) where
 instance Traversable t => Crosswalk (MaybeT t) where
     crosswalk f (MaybeT xs) = case traverse go xs of Fill _ ys -> MaybeT <$> ys
       where go mx = Fill Nothing (Just <$> maybe nil f mx)
+
+instance Crosswalk (HM.HashMap k) where
+    crosswalk f xs = case traverse go xs of Fill _ ys -> HM.mapMaybe id <$> ys
+      where go mx = Fill Nothing (Just <$> f mx)
+
+instance Crosswalk (M.Map k) where
+    crosswalk f = fmap (M.fromDistinctAscList . getCompose)
+      . crosswalk f . Compose . M.toAscList
+
+instance Crosswalk IM.IntMap where
+    crosswalk f = fmap (IM.fromDistinctAscList . getCompose)
+      . crosswalk f . Compose . IM.toAscList
 
 -- --------------------------------------------------------------------------
 -- | Bifoldable bifunctors supporting traversal through an alignable

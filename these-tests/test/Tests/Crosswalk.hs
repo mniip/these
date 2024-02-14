@@ -13,6 +13,8 @@ import Data.Functor.Compose          (Compose (..))
 import Data.Functor.Identity         (Identity (..))
 import Data.Functor.Sum              (Sum)
 import Data.Functor.These            (These1)
+import Data.HashMap.Lazy             (HashMap)
+import Data.IntMap                   (IntMap)
 import Data.List.NonEmpty            (NonEmpty)
 import Data.Map                      (Map)
 import Data.Proxy                    (Proxy)
@@ -57,6 +59,9 @@ crosswalkProps = testGroup "Crosswalk"
     , crosswalkLaws (P :: P (These1 [] []))
     , crosswalkLaws (P :: P (Compose [] []))
     , crosswalkLaws (P :: P (MaybeT []))
+    , crosswalkLaws (P :: P (HashMap Int))
+    , crosswalkLaws (P :: P (Map Int))
+    , crosswalkLaws (P :: P IntMap)
     ]
 
 -------------------------------------------------------------------------------
