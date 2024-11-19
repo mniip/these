@@ -7,17 +7,19 @@ module Data.Crosswalk (
     Bicrosswalk (..),
     ) where
 
-import Control.Applicative   (pure, (<$>), Const(..))
-import Data.Bifoldable       (Bifoldable (..))
-import Data.Bifunctor        (Bifunctor (..))
-import Data.Foldable         (Foldable (..))
-import Data.Functor.Compose  (Compose (..))
-import Data.Functor.Identity (Identity (..))
-import Data.Functor.Sum      (Sum (..))
-import Data.Functor.These    (These1 (..))
-import Data.Proxy            (Proxy (..))
-import Data.Vector.Generic   (Vector)
-import Prelude               (Either (..), Functor (fmap), Maybe (..), id, (.))
+import Control.Applicative       (Applicative (pure, (<*>)), (<$>), Const(..))
+import Control.Monad.Trans.Maybe (MaybeT (..))
+import Data.Bifoldable           (Bifoldable (..))
+import Data.Bifunctor            (Bifunctor (..))
+import Data.Foldable             (Foldable (..))
+import Data.Functor.Compose      (Compose (..))
+import Data.Functor.Identity     (Identity (..))
+import Data.Functor.Sum          (Sum (..))
+import Data.Functor.These        (These1 (..))
+import Data.Proxy                (Proxy (..))
+import Data.Traversable          (Traversable (traverse))
+import Data.Vector.Generic       (Vector)
+import Prelude                   (Either (..), Functor (fmap), Maybe (..), id, (.), uncurry, maybe)
 
 import qualified Data.List.NonEmpty  as NE
 import qualified Data.Sequence       as Seq
@@ -113,6 +115,18 @@ instance (Crosswalk f, Crosswalk g) => Crosswalk (Compose f g) where
         = fmap Compose -- can't coerce: maybe the Align-able thing has role nominal
         . crosswalk (crosswalk f)
         . getCompose
+
+data Fill f a = Fill a (f a)
+  deriving (Functor)
+
+instance Align f => Applicative (Fill f) where
+    pure x = Fill x nil
+    Fill deff fs <*> Fill defx xs
+      = Fill (deff defx) (alignWith (uncurry id . fromThese deff defx) fs xs)
+
+instance Traversable t => Crosswalk (MaybeT t) where
+    crosswalk f (MaybeT xs) = case traverse go xs of Fill _ ys -> MaybeT <$> ys
+      where go mx = Fill Nothing (Just <$> maybe nil f mx)
 
 -- --------------------------------------------------------------------------
 -- | Bifoldable bifunctors supporting traversal through an alignable

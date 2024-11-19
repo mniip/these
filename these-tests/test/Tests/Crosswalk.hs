@@ -5,6 +5,7 @@ module Tests.Crosswalk (crosswalkProps) where
 
 import Control.Applicative           (Const)
 import Control.Monad.Trans.Instances ()
+import Control.Monad.Trans.Maybe     (MaybeT)
 import Data.Functor.Compose          (Compose (..))
 import Data.Functor.Identity         (Identity (..))
 import Data.Functor.Sum              (Sum)
@@ -46,6 +47,7 @@ crosswalkProps = testGroup "Crosswalk"
     , crosswalkLaws (P :: P (Sum [] []))
     , crosswalkLaws (P :: P (These1 [] []))
     , crosswalkLaws (P :: P (Compose [] []))
+    , crosswalkLaws (P :: P (MaybeT []))
     ]
 
 -------------------------------------------------------------------------------
